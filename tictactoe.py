@@ -45,7 +45,7 @@ def actions(board):
     for i in range(len(board)):
         for j in range(len(board[i])):
             if board[i][j] == EMPTY:
-                allPossibleActions.append([i, j])
+                allPossibleActions.append((i, j))
 
     return allPossibleActions
 
@@ -67,19 +67,19 @@ def winner(board):
 
     winner = ''
     for i in range(len(board)):
-        if board[i][0] == board[i][1] and board[i][1] == board[i][2]:
+        if  board[i][0] != EMPTY and board[i][0] == board[i][1] and board[i][1] == board[i][2]:
             winner = board[i][0]
 
     for j in range(len(board)):
-        if board[0][j] == board[1][j] and board[1][j] == board[2][j]:
+        if board[0][j] != EMPTY and board[0][j] == board[1][j] and board[1][j] == board[2][j]:
             winner = board[0][j]
 
-    if board[0][0] == board[1][1] and  board[1][1] == board[2][2]:
+    if  board[0][0] != EMPTY and board[0][0] == board[1][1] and  board[1][1] == board[2][2]:
         winner = board[0][0]
 
-    elif board[0][2] == board[1][1] and  board[1][1] == board[2][0]:
+    elif board[0][2] != EMPTY and board[0][2] == board[1][1] and  board[1][1] == board[2][0]:
         winner = board[0][2]
-
+    
     return winner or ''
 
 
@@ -107,14 +107,8 @@ def utility(board):
 
 
 def minimax_aux(board):
-    if utility(board) == -1:
-        return -1
-
-    elif utility(board) == 1:
-        return 1
-
     if terminal(board):
-        return 0
+        return utility(board)
 
     if player(board) == X:
         best = -999
@@ -136,8 +130,8 @@ def minimax(board):
     """
     Returns the optimal action for the current player on the board.
     """
-    if len(actions(board)) == 9:
-        return [0, 0]
+    if terminal(board):
+        return None
 
     aiPlayer = player(board)
     if aiPlayer == 'X':
@@ -155,14 +149,7 @@ def minimax(board):
 
         board[action[0]][action[1]] = EMPTY
 
-        if aiPlayer == 'X' and valueNow > bestValueSoFar:
-            move = []
-            move.append(action[0])
-            move.append(action[1])
-            bestMoveSoFar = move
-            bestValueSoFar = valueNow
-
-        if aiPlayer == 'O' and valueNow < bestValueSoFar:
+        if aiPlayer == 'X' and valueNow > bestValueSoFar or aiPlayer == 'O' and valueNow < bestValueSoFar:
             move = []
             move.append(action[0])
             move.append(action[1])
