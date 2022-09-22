@@ -3,7 +3,7 @@ Tic Tac Toe Player
 """
 
 import math
-
+import copy
 X = "X"
 O = "O"
 EMPTY = None
@@ -41,11 +41,11 @@ def actions(board):
     """
     Returns set of all possible actions (i, j) available on the board.
     """
-    allPossibleActions = []
+    allPossibleActions = set()
     for i in range(len(board)):
         for j in range(len(board[i])):
             if board[i][j] == EMPTY:
-                allPossibleActions.append((i, j))
+                allPossibleActions.add((i, j))
 
     return allPossibleActions
 
@@ -54,7 +54,7 @@ def result(board, action):
     """
     Returns the board that results from making move (i, j) on the board.
     """
-    updatedBoard = board
+    updatedBoard = copy.deepcopy(board)
     if updatedBoard[action[0]][action[1]] == EMPTY:
         updatedBoard[action[0]][action[1]] = player(board)
     return updatedBoard
@@ -88,7 +88,7 @@ def terminal(board):
     Returns True if game is over, False otherwise.
     """
 
-    if winner(board) != '' or actions(board) == []:
+    if winner(board) != '' or len(actions(board)) == 0:
         return True
     else:
         return False
@@ -113,17 +113,15 @@ def minimax_aux(board):
     if player(board) == X:
         best = -999
         for action in actions(board):
-            board = result(board, action)
-            best = max(best, minimax_aux(board))
-            board[action[0]][action[1]] =  EMPTY
+            tempBoard = result(board, action)
+            best = max(best, minimax_aux(tempBoard))
         return best
 
     else:
         best = 999
         for action in actions(board):
-            board = result(board, action)
-            best = min(best, minimax_aux(board))
-            board[action[0]][action[1]] =  EMPTY
+            tempBoard = result(board, action)
+            best = min(best, minimax_aux(tempBoard))
         return best
     
 def minimax(board):
@@ -139,20 +137,16 @@ def minimax(board):
     else:
         bestValueSoFar = 999
 
-    bestMoveSoFar = [-1, -1]
+    bestMoveSoFar = [None, None]
 
     for action in actions(board):
 
-        board = result(board, action)
+        tempBoard = result(board, action)
 
-        valueNow = minimax_aux(board)
-
-        board[action[0]][action[1]] = EMPTY
+        valueNow = minimax_aux(tempBoard)
 
         if aiPlayer == 'X' and valueNow > bestValueSoFar or aiPlayer == 'O' and valueNow < bestValueSoFar:
-            move = []
-            move.append(action[0])
-            move.append(action[1])
+            move = action
             bestMoveSoFar = move
             bestValueSoFar = valueNow
 
